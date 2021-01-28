@@ -13,7 +13,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 In the app you can see a textarea where you can input your JSON string and a button to trigger formatting.
 
 1. Paste your JSON string into textarea
-2. Click the 'Prettify JSON'
+2. Click the 'Prettify JSON' button
 3. Enjoy!
 
 
