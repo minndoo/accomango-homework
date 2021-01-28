@@ -1,3 +1,40 @@
+.json-object-viewer-tree-toggle {
+  padding: 0.5px 3px;
+  margin-right: 5px;
+  outline: none;
+  cursor: pointer;
+  font-size: 16px;
+
+  &.tree-open {
+    transform: rotate(90deg);
+  }
+}
+
 .json-object-viewer-list {
   list-style: none;
+  position: relative;
+  &::before {
+    content: '';
+    left: 0;
+    width: 1px;
+    height: 90%;
+    background-color: transparent;
+    border-left: 1px #bbbbbb dotted;
+    position: absolute;
+  }
+}
+
+.object-value-type {
+  &-string {
+    color: #0b7500;
+  }
+  &-number {
+    color: #1a01cc;
+  }
+  &-boolean-true {
+    color: green;
+  }
+  &-boolean-false {
+    color: red;
+  }
 }

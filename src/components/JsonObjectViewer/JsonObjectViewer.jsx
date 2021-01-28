@@ -1,18 +1,25 @@
-import React from 'react';
+import React, {useState} from 'react';
 
-import './JsonObjectViewer.css';
+import './JsonObjectViewer.scss';
 
 export const JsonObjectViewer = ({objectToView, objectKey, currentDepth = 0,...rest}) => {
+  const [isTreeOpen, setIsTreeOpen] = useState(true);
 
-  const renderSimpleType = ({value, key}) => <li className="json-object-viewer-list-item">{key && <span>"{key}" : </span>}{value},</li>
+  const buttonToggleClassName = `json-object-viewer-tree-toggle ${isTreeOpen ? 'tree-open' : ''}`.trim();
+
+  const toggleTreeOpen = () => {
+    setIsTreeOpen(!isTreeOpen);
+  }
+
+  const renderSimpleType = ({value, key, index}) => <li className="json-object-viewer-list-item" key={`${currentDepth}-${index}`}>{key && <span>"{key}" : </span>}{value},</li>
   
-  const handleRender = ({value, key}) => {
+  const handleRender = ({value, key, index}) => {
     const objectType = typeof value;
     let valueComponent = null;
 
     switch (objectType) {
       case 'object' : {
-        return <li><JsonObjectViewer currentDepth={currentDepth+1} objectToView={value} objectKey={key} /></li>
+        return <JsonObjectViewer currentDepth={currentDepth+1} objectToView={value} objectKey={key} />;
       }
 
       case 'undefined' : {
@@ -31,13 +38,13 @@ export const JsonObjectViewer = ({objectToView, objectKey, currentDepth = 0,...r
       }
 
       case 'boolean' : {
-        const booleanTypeClassName = objectToView ? 'true' : 'false';
-        valueComponent = <span className={`object-value-type-boolean-${booleanTypeClassName}`}>{value}</span>;
+        const booleanTypeValue = value ? 'true' : 'false';
+        valueComponent = <span className={`object-value-type-boolean-${booleanTypeValue}`}>{booleanTypeValue}</span>;
         break;
       }
     }
 
-    return renderSimpleType({value: valueComponent, key: key});
+    return renderSimpleType({value: valueComponent, key, index});
   }
 
   const renderChildren = (objectToView) => {
@@ -45,8 +52,8 @@ export const JsonObjectViewer = ({objectToView, objectKey, currentDepth = 0,...r
       return <>
       {'['}
       <ul className="json-object-viewer-list">
-        {objectToView.map((currentValue) => {
-          return handleRender({value:currentValue});
+        {objectToView.map((currentValue, index) => {
+          return handleRender({value:currentValue, index});
         })}
       </ul>
       {']'}
@@ -54,20 +61,28 @@ export const JsonObjectViewer = ({objectToView, objectKey, currentDepth = 0,...r
     } else if(typeof objectToView === "object" && !Array.isArray(objectToView)) {
       const objectToViewKeys = Object.keys(objectToView);
 
-      return <>
-      {objectKey && <span>"{objectKey}" : </span>}
-      {'{'}
+      return(
+        <>
+        {'{'}
         <ul className="json-object-viewer-list">
-          {objectToViewKeys.map((currentValue) => {
-            return handleRender({value: objectToView[currentValue], key: currentValue});
+          {objectToViewKeys.map((currentValue, index) => {
+            return handleRender({value: objectToView[currentValue], key: currentValue, index});
           })}
         </ul>
-      {'},'}
-      </>
+        {'},'}
+        </>
+      );
     }
   }
 
-  
+  if(!objectToView || Object.keys(objectToView).length === 0) {
+    return null;
+  }
 
-  return renderChildren(objectToView);
+  return <div className="json-object-viewer-wrapper">
+      <button className={buttonToggleClassName} onClick={toggleTreeOpen} >{'>'}</button>
+        {objectKey && <span>{objectKey} : </span>}
+        {!isTreeOpen && <span>...</span>}
+        {isTreeOpen && renderChildren(objectToView)}
+    </div>;
 }

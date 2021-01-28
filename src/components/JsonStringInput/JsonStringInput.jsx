@@ -1,18 +1,28 @@
-import React from 'react';
+import React, {useState} from 'react';
 
-export const JsonStringInput = ({onChange, ...rest}) => {
+export const JsonStringInput = ({onButtonClick, ...rest}) => {
+  const [textAreaValue, setTextAreaValue] = useState("");
+
   const onChangeHandle = ({target}) => {
     const {value} = target;
-    
+    setTextAreaValue(value);
+  }
+  const handleOnButtonClick = () => {
     try {
-      const jsonParsedObject = JSON.parse(value);
+      const jsonParsedObject = JSON.parse(textAreaValue);
       if(jsonParsedObject) {
-        onChange && onChange(jsonParsedObject)
+        onButtonClick && onButtonClick(jsonParsedObject)
       }
     } catch {
-      onChange && onChange({});
+      onButtonClick && onButtonClick({});
     }
-  } 
+  }
 
-  return <textarea onChange={onChangeHandle} {...rest}></textarea>
+  return (<>
+    <h1>Put your JSON here!</h1>
+    <textarea onChange={onChangeHandle} cols={50} rows={10} {...rest}></textarea>
+    <div>
+      <button onClick={handleOnButtonClick} style={{marginBottom: "20px"}}>Prettify JSON</button>
+    </div>
+    </>)
 }
